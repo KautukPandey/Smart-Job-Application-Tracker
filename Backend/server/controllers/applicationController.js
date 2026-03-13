@@ -115,4 +115,39 @@ const deleteApplication = asyncHandler(async (req,res)=>{
     return res.status(200).json(new ApiResponse(200,"Application deleted",application))
 
 })
-module.exports = { addApplication, getApplications , getApplicationById , updateApplication , deleteApplication}
+
+const getApplicationStats = asyncHandler(async (req,res)=>{
+    const stats = await Application.aggregate([
+        {
+            $match: {
+                user: req.user._id
+            }
+        },
+        {
+            $group: {
+                _id: "$status",
+                count: { $sum: 1 }
+            }
+        }
+    ])
+
+    const result = {
+        total: 0,
+        Applied: 0,
+        Interview: 0,
+        Rejected: 0,
+        Offer: 0
+    }
+
+    stats.forEach(item=>{
+        result[item.id] = item.count;
+        result.total += item.count;
+    })
+
+    return res.status(200).json(
+        new ApiResponse(200, "Application statistics", result)
+    );
+}) 
+
+
+module.exports = { addApplication, getApplications , getApplicationById , updateApplication , deleteApplication , getApplicationStats}

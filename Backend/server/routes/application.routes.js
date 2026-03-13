@@ -13,6 +13,7 @@ const protect = require("../middleware/authMiddleware");
 
 
 router.post("/", protect, addApplication);
+router.get("/stats", protect, getApplicationStats);
 router.get("/", protect, getApplications);
 router.get("/:id", protect, getApplicationById);
 router.put("/:id", protect, updateApplication);
